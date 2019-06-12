@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- sql语句 -->
+<mapper namespace="org.xatu.novel.mapper.AuthorMapper">
+	<!-- 插入一条作者的信息 -->
+	<insert id="addAuthor" parameterType="Author">
+		insert into author(author_id,create_date,novel_count,name) 
+		values(#{author_id},#{create_date},#{novel_count},#{name})
+	</insert>
+	
+	<!--插入用户的教育经历信息 -->
+	<insert id="addExperience" parameterType="Experience">
+		insert into user_experience(experience_id,school,subject,inschool,outschool,educational) 
+		values(#{experience_id},#{school},#{subject},#{inschool},#{outschool},#{educational}) 
+	</insert>
+	
+	<!-- 查询作者信息 -->
+	<select id="selectAuthor" parameterType="String" resultType="map">
+		select author_id,name,novel_count from author where author_id=#{author_id}
+	</select>
+	
+	<!-- 查询指定作者的名下的小说信息 -->
+	<select id="selectNovelByAuthor" parameterType="String" resultType="map">
+		select novel.name,novel_type.type_name, novel.birthday 
+		from novel,novel_type,author 
+		where novel.author_id=author.author_id 
+		and novel_type.type_id=novel.type_id 
+		and author.name=#{authorName}
+	</select>
+	
+	<!-- 更新小说数量 -->
+	<update id="addNovelCount" parameterType="String">
+		update author set novel_count = novel_count+1 where name=#{name}
+	</update>
+	
+</mapper>

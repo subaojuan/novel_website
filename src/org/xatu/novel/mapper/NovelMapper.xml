@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- NovelMapper 对应的sql语句 -->
+<mapper namespace="org.xatu.novel.mapper.NovelMapper">
+	<!-- 插入小说基本信息 -->
+	<insert id="addNovel" parameterType="Novel">
+	insert into novel
+	(novel_id,type_id,author_id,name,birthday,info,units,last_modified_date,img,publish)
+	 values 
+	(#{novel_id},#{type_id},#{author_id},#{name},#{birthday},#{info},#{units},#{last_modified_date},#{img},#{publish})
+	 </insert>
+	
+	<!-- 查询指定类型的小说信息 -->
+	<select id="selectNovels" resultType="java.util.Map">
+	select novel_id,type_id,author_id,name,birthday,info,img,publish,units,last_modified_date from novel
+	</select>
+	
+	<!-- 模糊查询部分 -->
+	<select id="select" resultType="java.util.Map" parameterType="String">
+	select novel_id,author.author_id,novel.name,author.name as author_name,birthday from novel,author 
+		where novel.author_id=author.author_id 
+    and novel.name like #{novelname} || '%'
+	</select>
+	
+	<!-- 按照小说名字查找小说详细信息 -->
+	<select id="detail" resultType="java.util.Map" parameterType="String">
+  select novel_id,novel.type_id,type_name,novel.author_id,novel.name as novel_name,novel.birthday,info,img,publish,units,novel.last_modified_date,author.name as author_name 
+      from novel,novel_type,author 
+      where novel.type_id=novel_type.type_id 
+      and 
+          novel.author_id=author.author_id
+        and
+          novel.name=#{novelName}
+	</select>
+	<!-- 根据小说名字查询所有单元 -->
+	<select id="units" resultType="java.util.Map" parameterType="String">
+	select unit from novel,novel_main where novel.novel_id=novel_main.novel_id and name=#{name}
+	</select>
+	
+	<!-- 多条件查询：某一指定小说、单元的信息-->
+	<select id="mainInfo" resultType="java.util.Map" parameterType="java.util.Map">
+	select novel.name,content,count,novel_main.update_date from novel_main,novel  
+		where 
+		novel.novel_id=novel_main.novel_id 
+		and unit = #{unit} and novel.name=#{name}
+	</select>
+	
+	<!-- 查出，指定小说名的小说的单元数目，注意是novel_main中的单元数 -->
+	<select id="totalUnit" resultType="java.util.Map" parameterType="String">
+	select count(unit) as total  from novel_main,novel where novel.novel_id=novel_main.novel_id 
+   		and novel.name=#{name}
+	</select>
+	
+	<!-- 查询小说的信息：用于修改页面 -->
+	<select id="selectNovelDetail" resultType="java.util.Map" parameterType="String">
+		select author.name as author_name,novel.name as novel_name,novel.birthday,novel.info,novel.img,novel.units 
+		from novel,author 
+		where author.author_id=novel.author_id 
+		and novel.name=#{novelName}
+	</select>
+	
+	<!-- 更新小说信息 -->
+	<update id="updateNovelDetail" parameterType="Novel">
+		update novel 
+		<set>
+			<if test="img != null">
+				 img=#{img},
+			</if>
+			<if test="name != null">
+				 name=#{name},
+			</if>
+			<if test="info != null">
+				 info=#{info} 
+			</if>
+		</set>
+		 where name=#{name}
+	</update>
+	
+	<!-- 查询单元详细信息 -->
+	<select id="selectUnitByName" resultType="map" parameterType="String">
+		select novel.name,novel_main.unit,novel_main.content,novel_main.update_date 
+		from novel,novel_main 
+		where novel.novel_id=novel_main.novel_id 
+		and novel.name=#{novel_name}
+	</select>
+	
+	<!-- 通过书名查找书的id -->
+	<select id="selectIdByName" resultType="map" parameterType="String">
+		select novel.novel_id from novel where name=#{name}
+	</select>
+	
+	<update id="updateContent" parameterType="NovelMain">
+		update novel_main set content=#{content} ,update_date=#{update_date} where novel_id=#{novel_id} and unit=#{unit}
+	</update>
+	
+</mapper>

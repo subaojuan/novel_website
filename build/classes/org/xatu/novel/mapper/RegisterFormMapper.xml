@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- sql语句 -->
+<mapper namespace="org.xatu.novel.mapper.RegisterFormMapper">
+		<!-- 增加一个用户信息 -->
+	<insert id="addForm" parameterType="RegisterForm">
+		insert into user_register 
+		(id,name,password,email,telephone,info,
+		like1,like2,like3,like4,like5,like6,like7,like8,like9,like10,like11)
+			values(#{id},#{name},#{password},#{email},#{telephone},#{info},
+			#{like1},#{like2},#{like3},#{like4},#{like5},#{like6},#{like7},#{like8},#{like9},#{like10},#{like11}) 
+	</insert>
+	
+	<select id="login" parameterType="String" resultType="String">
+		select password from user_register where name=#{name}
+	</select>
+</mapper>
+
+

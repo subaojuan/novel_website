@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- sql语句 -->
+<mapper namespace="org.xatu.novel.mapper.NovelTypeMapper">
+	<!-- 查询所有的type_id和type_name -->
+	<select id="listTypes" resultType="String">
+		select type_name from novel_type order by type_id asc
+	</select>
+	
+	<!-- 通过类型名查找类型id -->
+	<select id="getIdByName" resultType="map" parameterType="String">
+		select type_id from novel_type where type_name=#{typeName}
+	</select>
+	
+	<!-- 通过类型号来查找小说基本信息，数据用来放在主页中
+		 Mapper.xml 文件里  < (小于)号 ,   >(大于)号 ,会被认为是括号,需要额外注意,java mybatis XML文件中不允许出现">"、"<"之类的符号
+		 解决办法 : 将 < 号换成  &lt;     > 号 换成&gt; 
+		错误： 元素内容必须由格式正确的字符数据或标记组成。
+	-->
+	<select id="selectByType" resultType="map" parameterType="Integer">
+		select novel.type_id,novel.name,novel.info,novel.img,
+		author.name as author_name from novel,author
+		 where novel.author_id=author.author_id 
+		 and novel.type_id=#{type_id} limit 10
+		 
+	</select>
+	
+	<!-- 查询某一指定类型的所有小说 -->
+	<select id="typeIndex" resultType="map" parameterType="Integer">
+		select novel.name as novel_name,novel.info,novel.img,novel.birthday,author.name as author_name,novel.last_modified_date 
+		from novel,author 
+		where author.author_id=novel.author_id
+		and novel.type_id=#{type_id}
+	</select>
+	
+	<!-- 通过类型编号查找到类型名 -->
+	<select id="selectNameById" resultType="map" parameterType="Integer">
+		select type_name from novel_type where type_id=#{type_id}
+	</select>
+</mapper>
